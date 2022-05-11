@@ -1,5 +1,7 @@
 /*
   xnrg_17_ornowe512.ino - Orno WE517-Modbus energy meter support for Tasmota
+  
+  WE504-Modbus laurentp@wp.pl
 
   Copyright (C) 2021  Maxime Vincent - based on the work of Gennaro Tortone and Theo Arends
 
@@ -19,6 +21,10 @@
 
 #ifdef USE_ENERGY_SENSOR
 #ifdef USE_WE517
+
+*/laurentp/*
+#define USE_WE504
+
 /*********************************************************************************************\
  * Orno WE517-Modbus energy meter
  *
@@ -45,9 +51,14 @@ TasmotaModbus *We517Modbus;
 
 const uint16_t we517_start_addresses[] {
   /*    */          // 3P4 3P3 1P2 Unit Description
+#ifdef USE_WE504
+  /*  0  */ 0x0000,  //  +   -   +   V    Phase 1 line to neutral volts
+#endif
+#ifdef USE_WE517
   /*  0  */ 0x000E,  //  +   -   +   V    Phase 1 line to neutral volts
   /*  1  */ 0x0010,  //  +   -   -   V    Phase 2 line to neutral volts
   /*  2  */ 0x0012,  //  +   -   -   V    Phase 3 line to neutral volts
+#endif
   /*  3  */ 0x0016,  //  +   +   +   A    Phase 1 current
   /*  4  */ 0x0018,  //  +   +   -   A    Phase 2 current
   /*  5  */ 0x001A,  //  +   +   -   A    Phase 3 current
