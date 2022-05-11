@@ -22,7 +22,7 @@
 #ifdef USE_ENERGY_SENSOR
 #ifdef USE_WE517
 
-*/laurentp/*
+/*laurentp*/
 #define USE_WE504
 
 /*********************************************************************************************\
@@ -52,27 +52,57 @@ TasmotaModbus *We517Modbus;
 const uint16_t we517_start_addresses[] {
   /*    */          // 3P4 3P3 1P2 Unit Description
 #ifdef USE_WE504
-  /*  0  */ 0x0000,  //  +   -   +   V    Phase 1 line to neutral volts
+  /*  0  */ 0x0000,  //  +   -   +   V    Phase 1 line to neutral volts (0.1 V)
 #endif
 #ifdef USE_WE517
   /*  0  */ 0x000E,  //  +   -   +   V    Phase 1 line to neutral volts
   /*  1  */ 0x0010,  //  +   -   -   V    Phase 2 line to neutral volts
   /*  2  */ 0x0012,  //  +   -   -   V    Phase 3 line to neutral volts
 #endif
+#ifdef USE_WE504
+  /*  1  */ 0x0001,  //  +   +   +   A    Phase 1 current (0.1 A)
+#endif  
+#ifdef USE_WE517
   /*  3  */ 0x0016,  //  +   +   +   A    Phase 1 current
   /*  4  */ 0x0018,  //  +   +   -   A    Phase 2 current
   /*  5  */ 0x001A,  //  +   +   -   A    Phase 3 current
+#endif
+#ifdef USE_WE504
+  /*  2  */ 0x0002,  //  +   +   +   A    Phase 1 frequency (0.1 Hz)
+#endif
+#ifdef USE_WE517
   /*  6  */ 0x001E,  //  +   -   +   kW   Phase 1 power
   /*  7  */ 0x0020,  //  +   -   +   kW   Phase 2 power
   /*  8  */ 0x0022,  //  +   -   -   kW   Phase 3 power
+#endif  
+#ifdef USE_WE504
+  /*  3  */ 0x0003,  //  +   +   +   A    Phase 1 power active (1W)
+#endif
+#ifdef USE_WE517  
   /*  9  */ 0x0026,  //  +   -   +   VAr  Phase 1 volt amps reactive
   /* 10  */ 0x0028,  //  +   -   -   VAr  Phase 2 volt amps reactive
   /* 11  */ 0x002A,  //  +   -   -   VAr  Phase 3 volt amps reactive
+#endif
+#ifdef USE_WE504
+  /*  4  */ 0x0004,  //  +   +   +   A    Phase 1 power reactive (1Var)
+#endif
+#ifdef USE_WE517    
   /* 12  */ 0x0036,  //  +   -   +        Phase 1 power factor
   /* 13  */ 0x0038,  //  +   -   -        Phase 2 power factor
   /* 14  */ 0x003A,  //  +   -   -        Phase 3 power factor
+#endif 
+#ifdef USE_WE504
+  /*  5  */ 0x0005,  //  +   +   +   A    Phase 1 power apparent (1VA)
+  /*  6  */ 0x0006,  //  +   +   +   A    Phase 1 power factor (1000)
+  /*  7  */ 0x0007,  //  +   +   +   A    Phase 1 energy active (1Wh) LSB
+  /*  8  */ 0x0008,  //  +   +   +   A    Phase 1 energy active (1Wh) MSB
+  /*  9  */ 0x0009,  //  +   +   +   A    Phase 1 energy reactive (1Varh) LSB
+  /*  A  */ 0x000A  //  +   +   +   A    Phase 1 energy reactive (1Varh) MSB
+#endif
+#ifdef USE_WE517    
   /* 15  */ 0x0014,  //  +   +   +   Hz   Frequency of supply voltages
   /* 16  */ 0x0100   //  +   +   +   kWh  Total active energy
+#endif
 };
 
 struct WE517 {
