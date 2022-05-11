@@ -123,7 +123,12 @@ void WE517Every250ms(void)
     AddLogBuffer(LOG_LEVEL_DEBUG_MORE, buffer, We517Modbus->ReceiveCount());
 
     if (error) {
-      AddLog(LOG_LEVEL_DEBUG, PSTR("ORNO: WE517 error %d"), error);
+#ifdef USE_WE517
+  AddLog(LOG_LEVEL_DEBUG, PSTR("ORNO: WE517 error %d"), error);
+#endif
+#ifdef USE_WE504
+  AddLog(LOG_LEVEL_DEBUG, PSTR("ORNO: WE504 error %d"), error);
+#endif
     } else {
       Energy.data_valid[0] = 0;
       Energy.data_valid[1] = 0;
@@ -133,14 +138,21 @@ void WE517Every250ms(void)
       // SA FC BC Fh Fl Sh Sl Cl Ch
       // 01 04 04 43 66 33 34 1B 38 = 230.2 Volt
       float value;
+#ifdef USE_WE517
       ((uint8_t*)&value)[3] = buffer[3];   // Get float values
       ((uint8_t*)&value)[2] = buffer[4];
       ((uint8_t*)&value)[1] = buffer[5];
       ((uint8_t*)&value)[0] = buffer[6];
+#endif      
 
       switch(We517.read_state) {
         case 0:
+#ifdef USE_WE504
+          Energy.voltage[0] = float(buffer[3] >> 8 + buffer[4]) * 0.1;
+#endif
+#ifdef USE_WE517          
           Energy.voltage[0] = value;
+#endif
           break;
 
         case 1:
@@ -218,7 +230,17 @@ void WE517Every250ms(void)
 
   if (0 == We517.send_retry || data_ready) {
     We517.send_retry = 5;
+#ifdef USE_WE504
+  if(We517.read_state < 7) {
+          We517Modbus->Send(WE517_ADDR, FUNCTION_CODE_READ_HOLDING_REGISTERS, we517_start_addresses[We517.read_state],  1);
+                           }
+    else {
+        We517Modbus->Send(WE517_ADDR, FUNCTION_CODE_READ_HOLDING_REGISTERS, we517_start_addresses[We517.read_state],  2);
+         }    
+#endif
+#ifdef USE_WE517
     We517Modbus->Send(WE517_ADDR, FUNCTION_CODE_READ_HOLDING_REGISTERS, we517_start_addresses[We517.read_state], 2);
+#endif    
   } else {
     We517.send_retry--;
   }
@@ -230,11 +252,21 @@ void We517SnsInit(void)
   uint8_t result = We517Modbus->Begin(WE517_SPEED);
   if (result) {
       if (2 == result) {
+#ifdef USE_WE504
+          AddLog(LOG_LEVEL_DEBUG, PSTR("ORNO: WE504 HW serial init 8E1 at %d baud"), WE517_SPEED);
+#endif
+#ifdef USE_WE517
           AddLog(LOG_LEVEL_DEBUG, PSTR("ORNO: WE517 HW serial init 8E1 at %d baud"), WE517_SPEED);
+#endif
           Serial.begin(WE517_SPEED, SERIAL_8E1);
           ClaimSerial();
       }
+#ifdef USE_WE504
+      Energy.phase_count = 1;
+#endif    
+#ifdef USE_WE517
       Energy.phase_count = 3;
+#endif    
       Energy.frequency_common = true; // Use common frequency
   } else {
       TasmotaGlobal.energy_driver = ENERGY_NONE;
