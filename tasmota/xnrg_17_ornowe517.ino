@@ -120,7 +120,14 @@ void WE517Every250ms(void)
     uint8_t buffer[14];  // At least 5 + (2 * 2) = 9
     uint32_t error;
 #ifdef USE_WE504
-    error = We517Modbus->ReceiveBuffer(buffer, 1);
+    if (We517.read_state < 7) {
+          error = We517Modbus->ReceiveBuffer(buffer, 1);
+                              }
+    else
+         {
+          error = We517Modbus->ReceiveBuffer(buffer, 2);
+         }
+    
 #endif
 #ifdef USE_WE517 && !defined(USE_WE504)
     error = We517Modbus->ReceiveBuffer(buffer, 2);
@@ -229,9 +236,17 @@ void WE517Every250ms(void)
           break;
 #endif
         case 7:
+#ifdef USE_WE504
+          Energy.import_active[0] = value;
+          EnergyUpdateTotal();
+          break;
+#endif
+#ifdef USE_WE517 && !defined(USE_WE504)
           Energy.active_power[1] = value * 1000;
           break;
+#endif
 
+#ifdef USE_WE517 && !defined(USE_WE504)        
         case 8:
           Energy.active_power[2] = value * 1000;
           break;
@@ -268,6 +283,7 @@ void WE517Every250ms(void)
           Energy.import_active[0] = value;
           EnergyUpdateTotal();
           break;
+#endif
       }
 
       We517.read_state++;
@@ -287,7 +303,7 @@ void WE517Every250ms(void)
         We517Modbus->Send(WE517_ADDR, FUNCTION_CODE_READ_HOLDING_REGISTERS, we517_start_addresses[We517.read_state],  2);
          }    
 #endif
-#ifdef USE_WE517
+#ifdef USE_WE517 && !defined(USE_WE504)
     We517Modbus->Send(WE517_ADDR, FUNCTION_CODE_READ_HOLDING_REGISTERS, we517_start_addresses[We517.read_state], 2);
 #endif    
   } else {
@@ -304,7 +320,7 @@ void We517SnsInit(void)
 #ifdef USE_WE504
           AddLog(LOG_LEVEL_DEBUG, PSTR("ORNO: WE504 HW serial init 8E1 at %d baud"), WE517_SPEED);
 #endif
-#ifdef USE_WE517
+#ifdef USE_WE517 && !defined(USE_WE504)
           AddLog(LOG_LEVEL_DEBUG, PSTR("ORNO: WE517 HW serial init 8E1 at %d baud"), WE517_SPEED);
 #endif
           Serial.begin(WE517_SPEED, SERIAL_8E1);
@@ -313,7 +329,7 @@ void We517SnsInit(void)
 #ifdef USE_WE504
       Energy.phase_count = 1;
 #endif    
-#ifdef USE_WE517
+#ifdef USE_WE517 && !defined(USE_WE504)
       Energy.phase_count = 3;
 #endif    
       Energy.frequency_common = true; // Use common frequency
