@@ -54,7 +54,7 @@ const uint16_t we517_start_addresses[] {
 #ifdef USE_WE504
   /*  0  */ 0x0000,  //  +   -   +   V    Phase 1 line to neutral volts (0.1 V)
 #endif
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
   /*  0  */ 0x000E,  //  +   -   +   V    Phase 1 line to neutral volts
   /*  1  */ 0x0010,  //  +   -   -   V    Phase 2 line to neutral volts
   /*  2  */ 0x0012,  //  +   -   -   V    Phase 3 line to neutral volts
@@ -62,7 +62,7 @@ const uint16_t we517_start_addresses[] {
 #ifdef USE_WE504
   /*  1  */ 0x0001,  //  +   +   +   A    Phase 1 current (0.1 A)
 #endif  
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
   /*  3  */ 0x0016,  //  +   +   +   A    Phase 1 current
   /*  4  */ 0x0018,  //  +   +   -   A    Phase 2 current
   /*  5  */ 0x001A,  //  +   +   -   A    Phase 3 current
@@ -70,7 +70,7 @@ const uint16_t we517_start_addresses[] {
 #ifdef USE_WE504
   /*  2  */ 0x0002,  //  +   +   +   A    Phase 1 frequency (0.1 Hz)
 #endif
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
   /*  6  */ 0x001E,  //  +   -   +   kW   Phase 1 power
   /*  7  */ 0x0020,  //  +   -   +   kW   Phase 2 power
   /*  8  */ 0x0022,  //  +   -   -   kW   Phase 3 power
@@ -78,7 +78,7 @@ const uint16_t we517_start_addresses[] {
 #ifdef USE_WE504
   /*  3  */ 0x0003,  //  +   +   +   A    Phase 1 power active (1W)
 #endif
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
   /*  9  */ 0x0026,  //  +   -   +   VAr  Phase 1 volt amps reactive
   /* 10  */ 0x0028,  //  +   -   -   VAr  Phase 2 volt amps reactive
   /* 11  */ 0x002A,  //  +   -   -   VAr  Phase 3 volt amps reactive
@@ -86,7 +86,7 @@ const uint16_t we517_start_addresses[] {
 #ifdef USE_WE504
   /*  4  */ 0x0004,  //  +   +   +   A    Phase 1 power reactive (1Var)
 #endif
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
   /* 12  */ 0x0036,  //  +   -   +        Phase 1 power factor
   /* 13  */ 0x0038,  //  +   -   -        Phase 2 power factor
   /* 14  */ 0x003A,  //  +   -   -        Phase 3 power factor
@@ -99,7 +99,7 @@ const uint16_t we517_start_addresses[] {
   /*  9  */ 0x0009   //  +   +   +   A    Phase 1 energy reactive (1Varh) LSB
   /*  A  */ /* 0x000A */ //  +   +   +   A    Phase 1 energy reactive (1Varh) MSB
 #endif
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
   /* 15  */ 0x0014,  //  +   +   +   Hz   Frequency of supply voltages
   /* 16  */ 0x0100   //  +   +   +   kWh  Total active energy
 #endif
@@ -129,13 +129,13 @@ void WE517Every250ms(void)
          }
     
 #endif
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
     error = We517Modbus->ReceiveBuffer(buffer, 2);
 #endif
     AddLogBuffer(LOG_LEVEL_DEBUG_MORE, buffer, We517Modbus->ReceiveCount());
 
     if (error) {
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
   AddLog(LOG_LEVEL_DEBUG, PSTR("ORNO: WE517 error %d"), error);
 #endif
 #ifdef USE_WE504
@@ -152,14 +152,14 @@ void WE517Every250ms(void)
       float value;
 #ifdef USE_WE504
      if (We517.read_state < 7) {
-       value = float(float(buffer[3] << 8 + buffer[4]);
+       value = float(buffer[3] << 8 + buffer[4]);
                                }
       else
         {
-       value = float(buffer[6] + buffer[5] << 8 + buffer[4] << 16 + buffer[3] << 24)); /*test!*/
+       value = float(buffer[6] + buffer[5] << 8 + buffer[4] << 16 + buffer[3] <<24); /*test!*/
         }
 #endif      
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
       ((uint8_t*)&value)[3] = buffer[3];   // Get float values
       ((uint8_t*)&value)[2] = buffer[4];
       ((uint8_t*)&value)[1] = buffer[5];
@@ -171,7 +171,7 @@ void WE517Every250ms(void)
           Energy.voltage[0] = value * 0.1;
           break;
 #endif
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
           Energy.voltage[0] = value;
           break;
 #endif
@@ -181,7 +181,7 @@ void WE517Every250ms(void)
           Energy.current[0] = value * 0.1;
           break;
 #endif
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
           Energy.voltage[1] = value;
           break;
 #endif        
@@ -191,7 +191,7 @@ void WE517Every250ms(void)
           Energy.frequency[0] = value * 0.1;
           break;
 #endif
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
           Energy.voltage[2] = value;
           break;
 #endif
@@ -201,7 +201,7 @@ void WE517Every250ms(void)
           Energy.active_power[0] = value;
           break;
 #endif
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
           Energy.current[0] = value;
           break;
 #endif    
@@ -211,7 +211,7 @@ void WE517Every250ms(void)
           Energy.reactive_power[0] = value;
           break;
 #endif
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
           Energy.current[1] = value;
 #endif
           break;
@@ -221,7 +221,7 @@ void WE517Every250ms(void)
           Energy.apparent_power[0] = value;
           break;
 #endif
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
           Energy.current[2] = value;
           break;
 #endif
@@ -231,7 +231,7 @@ void WE517Every250ms(void)
           Energy.power_factor[0] = value / 1000;
           break;
 #endif
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
           Energy.active_power[0] = value * 1000;
           break;
 #endif
@@ -241,12 +241,12 @@ void WE517Every250ms(void)
           EnergyUpdateTotal();
           break;
 #endif
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
           Energy.active_power[1] = value * 1000;
           break;
 #endif
 
-#ifdef USE_WE517 && !defined(USE_WE504)        
+#if (defined(USE_WE517) && !defined(USE_WE504))
         case 8:
           Energy.active_power[2] = value * 1000;
           break;
@@ -303,7 +303,7 @@ void WE517Every250ms(void)
         We517Modbus->Send(WE517_ADDR, FUNCTION_CODE_READ_HOLDING_REGISTERS, we517_start_addresses[We517.read_state],  2);
          }    
 #endif
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
     We517Modbus->Send(WE517_ADDR, FUNCTION_CODE_READ_HOLDING_REGISTERS, we517_start_addresses[We517.read_state], 2);
 #endif    
   } else {
@@ -320,7 +320,7 @@ void We517SnsInit(void)
 #ifdef USE_WE504
           AddLog(LOG_LEVEL_DEBUG, PSTR("ORNO: WE504 HW serial init 8E1 at %d baud"), WE517_SPEED);
 #endif
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
           AddLog(LOG_LEVEL_DEBUG, PSTR("ORNO: WE517 HW serial init 8E1 at %d baud"), WE517_SPEED);
 #endif
           Serial.begin(WE517_SPEED, SERIAL_8E1);
@@ -329,7 +329,7 @@ void We517SnsInit(void)
 #ifdef USE_WE504
       Energy.phase_count = 1;
 #endif    
-#ifdef USE_WE517 && !defined(USE_WE504)
+#if (defined(USE_WE517) && !defined(USE_WE504))
       Energy.phase_count = 3;
 #endif    
       Energy.frequency_common = true; // Use common frequency
