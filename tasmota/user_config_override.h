@@ -97,7 +97,7 @@ Examples :
 
 #define USE_WE517                                // Add support for Orno WE517-Modbus energy monitor (+1k code)
 
-#define USE_RF_SENSOR                            // Add support for RF sensor receiver (434MHz or 868MHz) (+0k8 code)
+#define USE_RC_SWITCH                            // Add support for RF transceiver using library RcSwitch (+2k7 code, 460 iram)
 
 
 
